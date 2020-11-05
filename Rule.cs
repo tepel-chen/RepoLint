@@ -55,7 +55,7 @@ namespace RepoLint
 
 		protected void Report(string problem) => (Problems ??= new List<string>()).Add($"{problem} ({name})");
 
-		protected void ReportLine(string problem, int lineNumber)
+		protected void ReportLine(string problem, long lineNumber)
 		{
 			var previous = GroupedProblems.Find(groupedProblem => lineNumber >= groupedProblem.Start - 1 && lineNumber <= groupedProblem.End + 1 && groupedProblem.Problem == problem);
 			if (previous != null)
@@ -74,8 +74,8 @@ namespace RepoLint
 		private class GroupedProblem
 		{
 			public string Problem;
-			public int Start;
-			public int End;
+			public long Start;
+			public long End;
 
 			public override string ToString()
 			{

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace RepoLint.Rules
 {
@@ -13,9 +14,13 @@ namespace RepoLint.Rules
 			{
 				JsonSerializer.Deserialize<Dictionary<string, object>>(Content);
 			}
-			catch (JsonException)
+			catch (JsonException exception)
 			{
-				Report("Invalid JSON.");
+				var message = Regex.Replace(exception.Message, @" \| Line.+", "");
+				if (exception.LineNumber.HasValue)
+					ReportLine(message, exception.LineNumber.Value + 1);
+				else
+					Report(message);
 			}
 		}
 	}
