@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace RepoLint.Rules
@@ -16,7 +15,7 @@ namespace RepoLint.Rules
 
 			foreach (var file in Directory.EnumerateFiles(RootPath, moduleName + "*.*", SearchOption.AllDirectories))
 			{
-				if (file == File.FullName)
+				if (Path.GetFullPath(file) == File.FullName)
 					continue;
 
 				files.Add(file);
@@ -26,7 +25,10 @@ namespace RepoLint.Rules
 			}
 
 			if (files.Count < 2)
-				Report($"Expected 2 other files (SVG and JSON) with the same name \"{moduleName}\", found {files.Count}: " + string.Join(", ", files.Select(file => Path.GetRelativePath(RootPath, file))));
+			{
+				var found = files.Count == 1 ? "only found: " + Path.GetRelativePath(RootPath, files[0]) : "found nothing.";
+				Report($"Expected 2 other files (Component SVG and JSON) with the same name \"{moduleName}\", " + found);
+			}
 		}
 	}
 }
