@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using AngleSharp.Dom;
+using SevenZip;
 
 namespace RepoLint
 {
@@ -22,33 +22,60 @@ namespace RepoLint
 					ScanRepo(path);
 					return;
 				}
-				else if (File.Exists(path) && Path.GetExtension(path) == ".zip")
+				else if (File.Exists(path))
 				{
-					ScanZip(path);
-					return;
+					if (new[] { ".zip", ".rar", ".7z" }.Contains(Path.GetExtension(path)))
+					{
+						ScanArchive(path);
+						return;
+					}
 				}
 			}
 
-			Console.Error.WriteLine("Pass either the repo or zip file to scan.");
+			Console.Error.WriteLine("Pass either the repo or archive to scan.");
 			Environment.ExitCode = 1;
         }
 
-		private static void ScanZip(string zipPath)
+		private static void ScanArchive(string archivePath)
 		{
+			string destDirectory = Path.GetRandomFileName();
+
 			try
 			{
-				ZipFile.ExtractToDirectory(zipPath, "tempZip");
-				LintDirectory("tempZip", GetRules(new[] { "FourIndentHTML" }));
+				SevenZipBase.SetLibraryPath("7z.dll");
+				using (var extractor = new SevenZipExtractor(archivePath))
+				{
+					extractor.Check();
+
+					if (extractor.UnpackedSize > 20000000)
+						throw new Exception("Archive is too big.");
+
+					if (extractor.FilesCount > 200)
+						throw new Exception("Archive has too many files.");
+
+					// https://snyk.io/research/zip-slip-vulnerability#dot-net
+					if (extractor.ArchiveFileNames.Any(fileName => {
+						string destFileName = Path.GetFullPath(Path.Combine(destDirectory, fileName));
+						string fullDestDirPath = Path.GetFullPath(destDirectory + Path.DirectorySeparatorChar);
+						return !destFileName.StartsWith(fullDestDirPath);
+					}))
+						throw new Exception("Archive traverses outside directory.");
+
+					extractor.ExtractArchive(destDirectory);
+				}
+
+				LintDirectory(destDirectory, GetRules(new[] { "FourIndentHTML" }));
 			}
-			catch(Exception exception)
+			catch (Exception exception)
 			{
-				Console.Error.WriteLine("Failed to scan zip:");
+				Console.Error.WriteLine("Failed to scan archive:");
 				Console.Error.WriteLine(exception);
 				Environment.ExitCode = 1;
 			}
 			finally
 			{
-				Directory.Delete("tempZip", true);
+				if (Directory.Exists(destDirectory))
+					Directory.Delete(destDirectory, true);
 			}
 		}
 
