@@ -99,6 +99,13 @@ namespace RepoLint
 			if (rootPath == null)
 				rootPath = path;
 
+			var directories = Directory.GetDirectories(path);
+			if (directories.Length == 1)
+			{
+				LintDirectory(directories[0], rules, directories[0]);
+				return;
+			}
+
             foreach (string file in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
             {
                 ScanFile(file, rules, rootPath);
