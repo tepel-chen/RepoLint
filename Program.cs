@@ -78,12 +78,19 @@ namespace RepoLint
 			}
 		}
 
-		private static readonly string[] Folders = new[] { "HTML", "JSON", "Icons" };
+		private static readonly string[] Folders = new[] { "HTML", "JSON" };
 		private static void ScanRepo(string repoDir)
 		{
             foreach (var folder in Folders)
             {
-                LintDirectory(Path.Combine(repoDir, folder), GetRules(new[] { "FourIndentHTML", "W3CValidator", "FontFamily" }), rootPath: repoDir);
+				var newPath = Path.Combine(repoDir, folder);
+				if (!Directory.Exists(newPath))
+				{
+					Console.WriteLine($"Can't find standard repo folder \"{folder}\", skipping.");
+					continue;
+				}
+
+                LintDirectory(newPath, GetRules(new[] { "FourIndentHTML", "W3CValidator" }), rootPath: repoDir);
             }
 		}
 
