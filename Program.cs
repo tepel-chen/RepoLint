@@ -120,9 +120,10 @@ namespace RepoLint
 				return;
 
 			List<string> problems = new List<string>();
+			long problemCount = 0;
 			foreach (Rule rule in applicableRules)
 			{
-				rule.AddProblems(file, rootPath, problems);
+				rule.AddProblems(file, rootPath, problems, ref problemCount);
 
 				// Stop after 15 problems, since we only display 15.
 				if (problems.Count > 15)
@@ -132,7 +133,7 @@ namespace RepoLint
 			if (problems.Count == 0)
 				return;
 
-			Console.WriteLine($"{Path.GetRelativePath(rootPath, file)}: ({problems.Count} problem{(problems.Count != 1 ? "s" : "")})");
+			Console.WriteLine($"{Path.GetRelativePath(rootPath, file)}: ({problemCount} problem{(problemCount != 1 ? "s" : "")})");
 			for (int i = 0; i < Math.Min(15, problems.Count); i++)
 				Console.WriteLine("    " + problems[i]);
 

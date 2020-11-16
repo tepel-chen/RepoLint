@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace RepoLint
 {
@@ -30,7 +31,7 @@ namespace RepoLint
 			GroupedProblems.Clear();
 		}
 
-		public void AddProblems(string path, string rootPath, List<string> allProblems)
+		public void AddProblems(string path, string rootPath, List<string> allProblems, ref long problemCount)
 		{
 			if (lastPath != path)
 			{
@@ -42,8 +43,14 @@ namespace RepoLint
 
 			Lint();
 
-			foreach (var groupedReport in GroupedProblems)
-				Report(groupedReport.ToString());
+			if (Problems != null)
+				problemCount += Problems.Count;
+
+			foreach (var group in GroupedProblems.GroupBy(groupedProblem => groupedProblem.Problem))
+			{
+				Report($"Line{(group.Count() == 1 ? "" : "s")} {string.Join(", ", group)}: {group.Key}");
+				problemCount += group.Sum(groupedProblem => groupedProblem.End - groupedProblem.Start + 1);
+			}
 
 			if (Problems != null)
 				allProblems.AddRange(Problems);
@@ -80,9 +87,9 @@ namespace RepoLint
 			public override string ToString()
 			{
 				if (Start == End)
-					return $"Line {Start}: {Problem}";
+					return Start.ToString();
 
-				return $"Lines {Start}-{End}: {Problem}";
+				return $"{Start}-{End}";
 			}
 		}
 	}
