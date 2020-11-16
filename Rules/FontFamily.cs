@@ -20,7 +20,7 @@ namespace RepoLint.Rules
 					continue;
 
 				if (!fontFamily.Split(',').Select(font => font.Trim().Trim('"')).Any(fonts.Contains))
-					Report($"Font family \"{fontFamily}\" doesn't match any included fonts.");
+					ReportElement($"Font family \"{fontFamily}\" doesn't match any included fonts.", rule.Owner.OwnerNode);
 			}
 		}
 	}
