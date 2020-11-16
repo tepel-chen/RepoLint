@@ -25,14 +25,13 @@ namespace RepoLint
 				else if (File.Exists(path))
 				{
 					if (new[] { ".zip", ".rar", ".7z" }.Contains(Path.GetExtension(path)))
-					{
 						ScanArchive(path);
-						return;
-					}
+					else
+						ScanFile(path, GetRules(new[] { "FourIndentHTML", "ExpectedFiles" }), path);
 				}
 			}
 
-			Console.Error.WriteLine("Pass either the repo or archive to scan.");
+			Console.Error.WriteLine("Pass either the repo or file to scan.");
 			Environment.ExitCode = 1;
         }
 
@@ -95,32 +94,37 @@ namespace RepoLint
 
             foreach (string file in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
             {
-                string extension = Path.GetExtension(file);
-                var applicableRules = rules.Where(rule => rule.Extensions.Contains(extension)).ToArray();
-                if (applicableRules.Length == 0)
-                    continue;
-
-                List<string> problems = new List<string>();
-                foreach (Rule rule in applicableRules)
-                {
-                    rule.AddProblems(file, rootPath, problems);
-
-                    // Stop after 15 problems, since we only display 15.
-                    if (problems.Count > 15)
-                        break;
-                }
-
-                if (problems.Count == 0)
-                    continue;
-
-                Console.WriteLine($"{Path.GetRelativePath(path, file)}: ({problems.Count} problem{(problems.Count != 1 ? "s" : "")})");
-                for (int i = 0; i < Math.Min(15, problems.Count); i++)
-                    Console.WriteLine("    " + problems[i]);
-
-                if (problems.Count > 15)
-                    Console.WriteLine("    ... 15 limit ...");
+                ScanFile(file, rules, rootPath);
             }
         }
+
+		private static void ScanFile(string file, Rule[] rules, string rootPath)
+		{
+			string extension = Path.GetExtension(file);
+			var applicableRules = rules.Where(rule => rule.Extensions.Contains(extension)).ToArray();
+			if (applicableRules.Length == 0)
+				return;
+
+			List<string> problems = new List<string>();
+			foreach (Rule rule in applicableRules)
+			{
+				rule.AddProblems(file, rootPath, problems);
+
+				// Stop after 15 problems, since we only display 15.
+				if (problems.Count > 15)
+					break;
+			}
+
+			if (problems.Count == 0)
+				return;
+
+			Console.WriteLine($"{Path.GetRelativePath(rootPath, file)}: ({problems.Count} problem{(problems.Count != 1 ? "s" : "")})");
+			for (int i = 0; i < Math.Min(15, problems.Count); i++)
+				Console.WriteLine("    " + problems[i]);
+
+			if (problems.Count > 15)
+				Console.WriteLine("    ... 15 limit ...");
+		}
 
 		private static Rule[] GetRules(string[] ignoredRules) => GetRules(name => !ignoredRules.Contains(name));
 		private static Rule[] GetRules(string onlyRule) => GetRules(name => name == onlyRule);
