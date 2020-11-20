@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,6 +28,8 @@ namespace RepoLint
 						ScanArchive(path);
 					else
 						ScanFile(path, GetRules(new[] { "FourIndentHTML", "ExpectedFiles" }), path);
+
+					return;
 				}
 			}
 
