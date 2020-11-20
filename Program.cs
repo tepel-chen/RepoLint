@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AngleSharp.Dom;
-using SevenZip;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace RepoLint
 {
@@ -43,26 +44,21 @@ namespace RepoLint
 
 			try
 			{
-				SevenZipBase.SetLibraryPath("7z.dll");
-				using (var extractor = new SevenZipExtractor(archivePath))
+				var reader = ArchiveFactory.Open(archivePath);
+				var entries = reader.Entries;
+
+				if (entries.Sum(entry => entry.Size) > 20000000)
+					throw new Exception("Archive is too big.");
+
+				if (entries.Count() > 200)
+					throw new Exception("Archive has too many files.");
+
+				foreach (var entry in entries)
 				{
-					extractor.Check();
-
-					if (extractor.UnpackedSize > 20000000)
-						throw new Exception("Archive is too big.");
-
-					if (extractor.FilesCount > 200)
-						throw new Exception("Archive has too many files.");
-
-					// https://snyk.io/research/zip-slip-vulnerability#dot-net
-					if (extractor.ArchiveFileNames.Any(fileName => {
-						string destFileName = Path.GetFullPath(Path.Combine(destDirectory, fileName));
-						string fullDestDirPath = Path.GetFullPath(destDirectory + Path.DirectorySeparatorChar);
-						return !destFileName.StartsWith(fullDestDirPath);
-					}))
-						throw new Exception("Archive traverses outside directory.");
-
-					extractor.ExtractArchive(destDirectory);
+					entry.WriteToDirectory(destDirectory, new ExtractionOptions() {
+						Overwrite = true,
+						ExtractFullPath = true
+					});
 				}
 
 				LintDirectory(destDirectory, GetRules(new[] { "FourIndentHTML" }));
