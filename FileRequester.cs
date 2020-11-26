@@ -17,6 +17,9 @@ namespace RepoLint
 			var path = HttpUtility.UrlDecode(request.Address.Path);
 			if (!fileCache.TryGetValue(path, out byte[] content))
 			{
+				if (!File.Exists(path))
+					return new DefaultResponse { StatusCode = System.Net.HttpStatusCode.NotFound };
+
 				content = await File.ReadAllBytesAsync(path).ConfigureAwait(false);
 				fileCache.Add(path, content);
 			}
