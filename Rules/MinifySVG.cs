@@ -1,5 +1,3 @@
-using AngleSharp.Dom;
-
 namespace RepoLint.Rules
 {
 	internal class MinifySVG : Rule
