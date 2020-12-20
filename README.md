@@ -16,7 +16,7 @@ Depending on what `path` points to, it'll be treated differently and use differe
 
 ### Other files
  * Just that file will be linted.
- * Excluded rules: `ExpectedFiles`.
+ * Excluded rules: `ExpectedFiles` and `ParentFolder`.
 
 ## Rules
 ### ConsecutiveBRs

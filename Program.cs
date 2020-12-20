@@ -28,7 +28,7 @@ namespace RepoLint
 					if (new[] { ".zip", ".rar", ".7z" }.Contains(Path.GetExtension(path)))
 						ScanArchive(path);
 					else
-						ScanFile(path, GetRules(new[] { "FourIndentHTML", "ExpectedFiles" }), path);
+						ScanFile(path, GetRules(new[] { "FourIndentHTML", "ExpectedFiles", "ParentFolder" }), path);
 
 					return;
 				}
