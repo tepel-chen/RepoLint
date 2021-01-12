@@ -45,7 +45,7 @@ namespace RepoLint
 			try
 			{
 				var reader = ArchiveFactory.Open(archivePath);
-				var entries = reader.Entries;
+				var entries = reader.Entries.Where(entry => !entry.Key.StartsWith("__MACOSX/"));
 
 				if (entries.Sum(entry => entry.Size) > 20000000)
 					throw new Exception("Archive is too big.");
