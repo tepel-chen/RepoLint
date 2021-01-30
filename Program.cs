@@ -15,6 +15,8 @@ namespace RepoLint
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
+			var treatAsRepo = args.Any(arg => arg == "--repo");
+			args = args.Where(arg => arg != "--repo").ToArray();
 			if (args.Length == 1)
 			{
 				var path = args[0];
@@ -28,14 +30,14 @@ namespace RepoLint
 					if (new[] { ".zip", ".rar", ".7z" }.Contains(Path.GetExtension(path)))
 						ScanArchive(path);
 					else
-						ScanFile(path, GetRules(new[] { "FourIndentHTML", "ExpectedFiles", "ParentFolder" }), path);
+						ScanFile(path, GetRules(treatAsRepo ? new[] { "FourIndentHTML" } : new[] { "FourIndentHTML", "ExpectedFiles", "ParentFolder" }), treatAsRepo ? "." : path);
 
 					return;
 				}
 			}
 
 			Console.Error.WriteLine("Pass either the repo or file to scan.");
-			Environment.ExitCode = 1;
+			Environment.ExitCode = 2;
         }
 
 		private static void ScanArchive(string archivePath)
@@ -67,7 +69,7 @@ namespace RepoLint
 			{
 				Console.Error.WriteLine("Failed to scan archive:");
 				Console.Error.WriteLine(exception);
-				Environment.ExitCode = 1;
+				Environment.ExitCode = 2;
 			}
 			finally
 			{
@@ -130,6 +132,8 @@ namespace RepoLint
 
 			if (problems.Count == 0)
 				return;
+
+			Environment.ExitCode = 1;
 
 			Console.WriteLine($"{(rootPath != file ? Path.GetRelativePath(rootPath, file) : Path.GetFileName(file))}: ({problemCount} problem{(problemCount != 1 ? "s" : "")})");
 			for (int i = 0; i < Math.Min(15, problems.Count); i++)
