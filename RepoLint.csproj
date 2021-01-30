@@ -12,4 +12,9 @@
     <PackageReference Include="sharpcompress" Version="0.26.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="vnu.jar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

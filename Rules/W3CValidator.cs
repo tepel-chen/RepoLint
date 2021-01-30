@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Reflection;
 
 namespace RepoLint.Rules
 {
@@ -28,14 +30,15 @@ namespace RepoLint.Rules
 			}
 		}
 
-		private static W3CMessage[] W3C(string Path)
+		private static W3CMessage[] W3C(string path)
 		{
+			var jarPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "vnu.jar");
 			Process process = new Process
 			{
 				StartInfo = new ProcessStartInfo
 				{
 					FileName = "java",
-					Arguments = $"-jar vnu.jar --format json --stdout \"{Path}\"",
+					Arguments = $"-jar {jarPath} --format json --stdout \"{path}\"",
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					WindowStyle = ProcessWindowStyle.Hidden,
