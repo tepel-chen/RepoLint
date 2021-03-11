@@ -133,8 +133,6 @@ namespace RepoLint
 			if (problems.Count == 0)
 				return;
 
-			Environment.ExitCode = 1;
-
 			Console.WriteLine($"{(rootPath != file ? Path.GetRelativePath(rootPath, file) : Path.GetFileName(file))}: ({problemCount} problem{(problemCount != 1 ? "s" : "")})");
 			for (int i = 0; i < Math.Min(15, problems.Count); i++)
 				Console.WriteLine("    " + problems[i]);
