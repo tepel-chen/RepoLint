@@ -100,7 +100,7 @@ namespace RepoLint
 				rootPath = path;
 
 			var directories = Directory.EnumerateDirectories(path).Where(directory => new DirectoryInfo(directory).Name != "__MACOSX").ToArray();
-			if (directories.Length == 1)
+			if (directories.Length == 1 && Directory.GetFiles(path).Length == 0)
 			{
 				LintDirectory(directories[0], rules, directories[0]);
 				return;
