@@ -23,11 +23,6 @@ namespace RepoLint.Rules
 		{
 			var children = document.Head.Children;
 			var childNumber = 0;
-			var childOffset = 0;
-
-			if (children.Length == 0)
-				return;
-
 			for (int i = 0; i < elements.Length; i++)
 			{
 				var element = elements[i];
@@ -36,15 +31,12 @@ namespace RepoLint.Rules
 				if (!matches && !element.Optional)
 				{
 					var childOrFallback = children[child == null ? children.Length - 1 : childNumber];
-					ReportElement($"Expected “{element.Text}” as the {Nth(childNumber + childOffset + 1)} child element in the <head>.", childOrFallback);
-					childOffset++;
+					ReportElement($"Expected “{element.Text}” as the {Nth(childNumber + 1)} child element in the <head>.", childOrFallback);
+					break;
 				}
 
 				if (matches)
 					childNumber++;
-
-				if (matches && element.Optional)
-					childOffset--;
 			}
 		}
 
