@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -7,14 +9,25 @@ namespace RepoLint.Rules
 {
 	internal class ExpectedFiles : Rule
 	{
-		public ExpectedFiles() : base(".html") {}
+		public ExpectedFiles() : base(".html") { }
 
 		static ExpectedFiles()
 		{
-			var webClient = new System.Net.WebClient();
-			var jsonString = webClient.DownloadString("https://ktane.timwi.de/json/raw");
-			var modules = JsonSerializer.Deserialize<WebsiteJSON>(jsonString).KtaneModules;
-			moduleNames = modules.ConvertAll(module => module.Name);
+			try
+			{
+				var httpClient = new HttpClient();
+				var response = httpClient.GetAsync("https://ktane.timwi.de/json/raw").Result;
+				if (!response.IsSuccessStatusCode)
+					return;
+
+				var jsonString = response.Content.ReadAsStringAsync().Result;
+				var modules = JsonSerializer.Deserialize<WebsiteJSON>(jsonString).KtaneModules;
+				moduleNames = modules.ConvertAll(module => module.Name);
+			}
+			catch
+			{
+				Console.Error.WriteLine("Failed to load the repository.");
+			}
 		}
 
 		static readonly List<string> moduleNames;
@@ -34,7 +47,7 @@ namespace RepoLint.Rules
 			var moduleName = Regex.Match(File.GetNameWithoutExtension(), @"^([A-Z\d❖][!-~]* ?)+").Value.Trim();
 			var files = new List<string>();
 
-			if (moduleNames.Contains(moduleName))
+			if (moduleNames != null && moduleNames.Contains(moduleName))
 				return;
 
 			foreach (var file in Directory.EnumerateFiles(RootPath, moduleName + "*.*", SearchOption.AllDirectories))
