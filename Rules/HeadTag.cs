@@ -22,6 +22,9 @@ namespace RepoLint.Rules
 		protected override void HTML(IDocument document)
 		{
 			var children = document.Head.Children;
+			if (children.Length == 0)
+				return;
+
 			var childNumber = 0;
 			for (int i = 0; i < elements.Length; i++)
 			{
