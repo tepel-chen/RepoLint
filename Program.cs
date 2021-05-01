@@ -67,8 +67,7 @@ namespace RepoLint
 			}
 			catch (Exception exception)
 			{
-				Console.Error.WriteLine("Failed to scan archive:");
-				Console.Error.WriteLine(exception);
+				Console.Error.WriteLine("Failed to scan archive: " + exception.Message);
 				Environment.ExitCode = 2;
 			}
 			finally
