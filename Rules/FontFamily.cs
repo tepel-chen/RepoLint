@@ -7,7 +7,7 @@ namespace RepoLint.Rules
 {
 	internal class FontFamily : ComplexHTMLRule
 	{
-		private static readonly string[] genericFonts = { "serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui" };
+		private static readonly string[] genericFonts = { "serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui", "inherit" };
 
 		protected override void HTML(IDocument document)
 		{
