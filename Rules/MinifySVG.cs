@@ -6,7 +6,7 @@ namespace RepoLint.Rules
 
 		protected override void Lint()
 		{
-			if (File.Directory.Name == "Component" && Content.Contains('\n'))
+			if ((File.Directory.Name == "Component" || SingleFile) && Content.Contains('\n'))
 				Report("Component SVGs should be minified with SVGOMG.");
 		}
 	}

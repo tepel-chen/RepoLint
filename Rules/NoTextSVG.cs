@@ -6,7 +6,7 @@ namespace RepoLint.Rules
 
 		protected override void Lint()
 		{
-			if (File.Directory.Name == "Component" && Content.Contains("<text "))
+			if ((File.Directory.Name == "Component" || SingleFile) && Content.Contains("<text "))
 				Report("<text> elements should be converted to <path> elements.");
 		}
 	}

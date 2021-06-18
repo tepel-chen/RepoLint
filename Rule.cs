@@ -17,6 +17,7 @@ namespace RepoLint
 		private readonly List<GroupedProblem> GroupedProblems = new List<GroupedProblem>();
 
 		public static FileInfo File;
+		public static bool SingleFile;
 		private static string lastPath;
 
 		public static string RootPath;
@@ -31,7 +32,7 @@ namespace RepoLint
 			GroupedProblems.Clear();
 		}
 
-		public void AddProblems(string path, string rootPath, List<string> allProblems, ref long problemCount)
+		public void AddProblems(string path, string rootPath, List<string> allProblems, bool singleFile, ref long problemCount)
 		{
 			if (lastPath != path)
 			{
@@ -40,6 +41,8 @@ namespace RepoLint
 				RootPath = rootPath;
 			}
 			lastPath = path;
+
+			SingleFile = singleFile;
 
 			Lint();
 

@@ -30,7 +30,7 @@ namespace RepoLint
 					if (new[] { ".zip", ".rar", ".7z" }.Contains(Path.GetExtension(path)))
 						ScanArchive(path);
 					else
-						ScanFile(path, GetRules(treatAsRepo ? new[] { "FourIndentHTML" } : new[] { "FourIndentHTML", "ExpectedFiles", "ParentFolder" }), treatAsRepo ? "." : path);
+						ScanFile(path, GetRules(treatAsRepo ? new[] { "FourIndentHTML" } : new[] { "FourIndentHTML", "ExpectedFiles", "ParentFolder" }), treatAsRepo ? "." : path, true);
 
 					return;
 				}
@@ -111,7 +111,7 @@ namespace RepoLint
             }
         }
 
-		private static void ScanFile(string file, Rule[] rules, string rootPath)
+		private static void ScanFile(string file, Rule[] rules, string rootPath, bool singleFile = false)
 		{
 			string extension = Path.GetExtension(file);
 			var applicableRules = rules.Where(rule => rule.Extensions.Contains(extension)).ToArray();
@@ -122,7 +122,7 @@ namespace RepoLint
 			long problemCount = 0;
 			foreach (Rule rule in applicableRules)
 			{
-				rule.AddProblems(file, rootPath, problems, ref problemCount);
+				rule.AddProblems(file, rootPath, problems, singleFile, ref problemCount);
 
 				// Stop after 15 problems, since we only display 15.
 				if (problems.Count > 15)
