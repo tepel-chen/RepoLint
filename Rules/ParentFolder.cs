@@ -6,7 +6,17 @@ namespace RepoLint.Rules
 	{
 		public ParentFolder() : base(".html .json .css .svg") { }
 
-		readonly string[] repoFiles = new[] { "Bomb.svg", "BombSide.svg", "repo-logo-unminified.svg", "repo-logo.svg", "twitch.svg" };
+		readonly string[] repoFiles = new[] {
+			"Bomb.svg",
+			"BombSide.svg",
+			"repo-logo-unminified.svg",
+			"repo-logo.svg",
+			"twitch.svg",
+			"time-mode-Assigned.svg",
+			"time-mode-Community.svg",
+			"time-mode-TwitchPlays.svg",
+			"time-mode-Unassigned.svg"
+		};
 
 		protected override void Lint()
 		{
