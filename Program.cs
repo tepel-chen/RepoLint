@@ -89,7 +89,7 @@ namespace RepoLint
 					continue;
 				}
 
-                LintDirectory(newPath, GetRules(new[] { "FourIndentHTML", "W3CValidator" }), rootPath: repoDir);
+                LintDirectory(newPath, GetRules(new[] { "FourIndentHTML", "W3CValidator", "PageNum" }), rootPath: repoDir);
             }
 		}
 
